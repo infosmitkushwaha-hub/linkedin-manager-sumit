@@ -268,14 +268,14 @@ If you need those capabilities, [`stickerdaniel/linkedin-mcp-server`](https://gi
 > - It uses your real, authenticated LinkedIn session (cookie/session reuse) — there is no sandbox. Running it means accepting the risk of account restriction or suspension.
 > - Anthropic/this project does not endorse, support, or take responsibility for use of that tool. Only run it against an account you're prepared to lose, and never use it for spam, mass messaging, or scraping at volume.
 
-It is **not vendored into this repository** and is **not started or configured by this server**. If you decide to use it anyway, run it as a completely separate, opt-in MCP server in your own client config:
+It is **not vendored into this repository** — no Python or browser-automation code lives here — but for convenience this repo ships an example combined client config at [`.mcp.json.example`](./.mcp.json.example) that wires up *both* servers at once:
 
 ```json
 {
   "mcpServers": {
     "linkedin": {
       "command": "node",
-      "args": ["/path/to/linkedin-mcp-server/dist/index.js"],
+      "args": ["./dist/index.js"],
       "env": {
         "LINKEDIN_CLIENT_ID": "your_client_id",
         "LINKEDIN_CLIENT_SECRET": "your_client_secret"
@@ -290,7 +290,14 @@ It is **not vendored into this repository** and is **not started or configured b
 }
 ```
 
-See that project's own README for install alternatives (Docker image, `.mcpb` bundle, local `uv` dev setup) and its `--login` / `--timeout` / `--proxy-server` CLI flags. Because the two servers register different tool names (`linkedin_*` here vs. unprefixed names like `get_person_profile`, `send_message`, `search_jobs` there), an MCP client can have both enabled simultaneously without collisions — but keep in mind only the official-API server here carries the "no account risk" guarantee.
+To use it: run `npm run build` in this repo first (so `dist/index.js` exists), install `uv`/`uvx` separately for the second server (see [its README](https://github.com/stickerdaniel/linkedin-mcp-server) for alternatives — Docker image, `.mcpb` bundle, local dev), then copy the example file:
+
+```bash
+cp .mcp.json.example .mcp.json
+# edit .mcp.json: fill in LINKEDIN_CLIENT_ID / LINKEDIN_CLIENT_SECRET
+```
+
+`.mcp.json` is gitignored so your credentials never get committed. Because the two servers register different tool names (`linkedin_*` here vs. unprefixed names like `get_person_profile`, `send_message`, `search_jobs` there), a client with both enabled sees no collisions — but only the `linkedin` (official-API) server carries the "no account risk" guarantee; enabling `linkedin-browser-unofficial` means accepting the risk described above.
 
 ## License
 

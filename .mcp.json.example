@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "linkedin": {
+      "command": "node",
+      "args": ["./dist/index.js"],
+      "env": {
+        "LINKEDIN_CLIENT_ID": "your_client_id",
+        "LINKEDIN_CLIENT_SECRET": "your_client_secret"
+      }
+    },
+    "linkedin-browser-unofficial": {
+      "command": "uvx",
+      "args": ["mcp-server-linkedin@latest"],
+      "env": {
+        "UV_HTTP_TIMEOUT": "300"
+      }
+    }
+  }
+}

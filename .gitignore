@@ -13,6 +13,9 @@ dist/
 .env.local
 .env.*.local
 
+# Local MCP client config (contains credentials) - see .mcp.json.example
+.mcp.json
+
 # IDE
 .idea/
 .vscode/
