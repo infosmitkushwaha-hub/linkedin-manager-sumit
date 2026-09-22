@@ -257,6 +257,41 @@ These are LinkedIn API restrictions, not server limitations:
 
 If your LinkedIn app has Community Management API or Advertising API approval, the server's capability detection will automatically enable additional modules when you authenticate with the corresponding scopes. The modular architecture supports adding new API modules without modifying the core server.
 
+## Optional: Browser-Automation Alternative (Higher Capability, Higher Risk)
+
+LinkedIn's official API (used by this server) does not expose several capabilities people commonly want from an AI assistant: reading other members' profiles, searching for people, reading your feed, or sending direct messages. These are intentionally closed off by LinkedIn to self-serve developer apps (see [Limitations](#limitations) above).
+
+If you need those capabilities, [`stickerdaniel/linkedin-mcp-server`](https://github.com/stickerdaniel/linkedin-mcp-server) is a separate, independent MCP server that provides them via **browser automation** (driving a real logged-in Chromium session with Playwright/Patchright) rather than the official API. It is **not part of this project**, has a different architecture and license, and is documented here only as a pointer for people who explicitly need its capabilities and accept its risks.
+
+> **⚠️ Important — read before using:**
+> - This is browser automation against LinkedIn's live web UI, **not** an official API integration. LinkedIn's own User Agreement prohibits automated scraping/access, and the project's own README states this "may violate LinkedIn's User Agreement/terms and can lead to account restrictions."
+> - It uses your real, authenticated LinkedIn session (cookie/session reuse) — there is no sandbox. Running it means accepting the risk of account restriction or suspension.
+> - Anthropic/this project does not endorse, support, or take responsibility for use of that tool. Only run it against an account you're prepared to lose, and never use it for spam, mass messaging, or scraping at volume.
+
+It is **not vendored into this repository** and is **not started or configured by this server**. If you decide to use it anyway, run it as a completely separate, opt-in MCP server in your own client config:
+
+```json
+{
+  "mcpServers": {
+    "linkedin": {
+      "command": "node",
+      "args": ["/path/to/linkedin-mcp-server/dist/index.js"],
+      "env": {
+        "LINKEDIN_CLIENT_ID": "your_client_id",
+        "LINKEDIN_CLIENT_SECRET": "your_client_secret"
+      }
+    },
+    "linkedin-browser-unofficial": {
+      "command": "uvx",
+      "args": ["mcp-server-linkedin@latest"],
+      "env": { "UV_HTTP_TIMEOUT": "300" }
+    }
+  }
+}
+```
+
+See that project's own README for install alternatives (Docker image, `.mcpb` bundle, local `uv` dev setup) and its `--login` / `--timeout` / `--proxy-server` CLI flags. Because the two servers register different tool names (`linkedin_*` here vs. unprefixed names like `get_person_profile`, `send_message`, `search_jobs` there), an MCP client can have both enabled simultaneously without collisions — but keep in mind only the official-API server here carries the "no account risk" guarantee.
+
 ## License
 
 MIT
